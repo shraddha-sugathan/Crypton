@@ -11,7 +11,7 @@ https://crypton-omega-olive.vercel.app/
 
 ## 🔎 Platform Overview
 
-![Crypton Platform Overview](./crypton-overview.png)
+![Crypton Platform Overview](./Crypton/crypton-overview.png)
 ---
 
 ## 📌 Table of Contents
