@@ -42,9 +42,6 @@ Crypton's security model relies on the fact that the decryption key never touche
 [Crypton Architecture]
 <img width="2167" height="1954" alt="architecture" src="https://github.com/user-attachments/assets/6c7312b2-f402-4db8-8971-90846aff7f22" />
 
-[Crypton Flow]
-<img width="834" height="1281" alt="Crypton_flow" src="https://github.com/user-attachments/assets/f176dbf2-ba24-4b4e-a25c-19198e274007" />
-
 
 
 1. The Cryptographic Engine (AES-256-GCM & PBKDF2)
