@@ -11,12 +11,12 @@ Currently, two official plugins are available:
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-## React Compiler🔒 Securebin: The Zero-Knowledge Digital Dead-Drop
+## React Compiler🔒 Crypton: The Zero-Knowledge Digital Dead-Drop
 The Problem: The Permanent Trail
 Every time you share an API key, a password, a server credential, or a sensitive screenshot via Slack, Teams, or Email, you create a permanent, unencrypted liability. That data lives in chat histories and server backups forever. If that platform is ever breached, or if an employee's laptop is compromised, your sensitive data is instantly exposed.
 
-The Solution: Securebin
-Securebin is a Zero-Knowledge, fully ephemeral secure sharing platform. It allows you to share sensitive text and images using military-grade client-side encryption. Once the message is viewed or the timer expires, it is mathematically obliterated from existence.
+The Solution: Crypton
+Crypton is a Zero-Knowledge, fully ephemeral secure sharing platform. It allows you to share sensitive text and images using military-grade client-side encryption. Once the message is viewed or the timer expires, it is mathematically obliterated from existence.
 
 Not even the server administrators, database hosts, or ISPs can read your data.
 
@@ -34,12 +34,16 @@ The Remote Kill Switch: Sent the link to the wrong person? Use the cryptographic
 Time-To-Live (TTL) Hard-Fails: Powered by Redis, expiration isn't just a software rule; it's a memory-level absolute. When the timer hits zero, the database evicts the data automatically.
 
 🏗️ Architectural Philosophy & Rationale
-Securebin was engineered from the ground up to solve the "Trust" problem. Standard pastebins require you to trust their servers. Securebin only requires you to trust mathematics.
+Crypton was engineered from the ground up to solve the "Trust" problem. Standard pastebins require you to trust their servers. Crypton only requires you to trust mathematics.
 
 🗺️ System Architecture Data Flow
-Securebin's security model relies on the fact that the decryption key never touches the server. Here is the lifecycle of a secure payload:
+Crypton's security model relies on the fact that the decryption key never touches the server. Here is the lifecycle of a secure payload:
 
-![Securebin Architecture](architecture.png)
+![Crypton Architecture]<img width="2167" height="1954" alt="architecture" src="https://github.com/user-attachments/assets/6c7312b2-f402-4db8-8971-90846aff7f22" />
+
+![Crypton Flow]<img width="834" height="1281" alt="Crypton_flow" src="https://github.com/user-attachments/assets/f176dbf2-ba24-4b4e-a25c-19198e274007" />
+
+
 
 1. The Cryptographic Engine (AES-256-GCM & PBKDF2)
 We utilize the native Web Crypto API to ensure high-performance, sandboxed cryptography.
@@ -54,7 +58,7 @@ The Rationale: The decryption key is generated locally and attached to the URL a
 3. Out-of-Band Authentication
 Users can optionally combine the auto-generated URL key with a manual, human-typed password.
 
-The Rationale: If a hacker compromises an email account and finds a Securebin link, they have both the vault location and the URL key. By requiring a manual password (sent via a secondary channel like SMS or Signal), we ensure that intercepting the digital link is useless without physical knowledge of the password.
+The Rationale: If a hacker compromises an email account and finds a Crypton link, they have both the vault location and the URL key. By requiring a manual password (sent via a secondary channel like SMS or Signal), we ensure that intercepting the digital link is useless without physical knowledge of the password.
 
 4. RAM-Only Ephemeral Storage (Redis)
 Instead of a traditional SQL or NoSQL hard-drive database, the backend is strictly powered by Redis.
@@ -69,9 +73,9 @@ Users can optionally combine the auto-generated URL key with a manual, human-typ
 The Rationale: This guarantees military-grade encryption by default, without forcing the user to invent a password. If a user does add a password, it acts as Out-of-Band Authentication. An attacker intercepting the digital URL still needs the physical password sent via a secondary channel (like SMS or Signal) to unlock the payload.
 
 4. The Anti-Bloat Philosophy (Why Less is More)
-Securebin intentionally avoids traditional enterprise security bloat: there are no user accounts, no login screens, no OAuth, and no complex server-side access control lists (ACLs).
+Crypton intentionally avoids traditional enterprise security bloat: there are no user accounts, no login screens, no OAuth, and no complex server-side access control lists (ACLs).
 
-The Rationale: Traditional security features require the server to know who you are and what you are doing, which completely destroys the Zero-Knowledge model. Furthermore, heavy Identity and Access Management (IAM) adds massive friction. Securebin is a "digital dead-drop," designed to be instantaneous. Dragging the system down with complex authentication workflows would deter users and defeat the core purpose: providing a frictionless, mathematically secure alternative to pasting secrets in plain text.
+The Rationale: Traditional security features require the server to know who you are and what you are doing, which completely destroys the Zero-Knowledge model. Furthermore, heavy Identity and Access Management (IAM) adds massive friction. Crypton is a "digital dead-drop," designed to be instantaneous. Dragging the system down with complex authentication workflows would deter users and defeat the core purpose: providing a frictionless, mathematically secure alternative to pasting secrets in plain text.
 
 5. RAM-Only Ephemeral Storage (Redis)
 Instead of a traditional SQL or NoSQL hard-drive database, the backend is strictly powered by Redis.
