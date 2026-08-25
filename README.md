@@ -1,100 +1,891 @@
-# Crypton
-Crypton is a privacy-first, zero knowledge secure sharing platform for encrypted secrets, files, and images. It uses client-side AES-256-GCM encryption, ephemeral Redis storge, self-destructing links, view limits, and image steganography for secure, temporary data sharing.
+# 🔐 Crypton
 
-# Deployed link
+### Secure, controlled and temporary sharing of sensitive information
+
+Crypton is a privacy-focused secure sharing platform for sharing sensitive text, files, and images without treating them as permanent data.
+
+The project combines **client-side AES-256-GCM encryption, temporary Redis storage, expiration, view limits, burn-after-reading, controlled viewing, deletion, and image steganography** into one workflow.
+
+**Live Demo:**
 https://crypton-omega-olive.vercel.app/
 
-# React + Vite
+---
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+## 📌 Table of Contents
 
-Currently, two official plugins are available:
+* [Problem](#-problem)
+* [Solution](#-solution)
+* [Key Features](#-key-features)
+* [Security Architecture](#-security-architecture)
+* [Encryption](#-encryption)
+* [Split-Key Design](#-split-key-design)
+* [Ephemeral Storage](#-ephemeral-storage)
+* [Image Steganography](#-image-steganography)
+* [Controlled Viewing](#-controlled-viewing)
+* [System Flow](#-system-flow)
+* [Technology Stack](#-technology-stack)
+* [Project Structure](#-project-structure)
+* [Running Locally](#-running-locally)
+* [Production Build](#-production-build)
+* [Security Considerations](#-security-considerations)
+* [Innovation](#-innovation)
+* [Judging Rubric](#-judging-rubric)
+* [Limitations](#-limitations)
+* [Future Improvements](#-future-improvements)
+* [Reference](#-reference)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler🔒 Crypton: The Zero-Knowledge Digital Dead-Drop
-The Problem: The Permanent Trail
-Every time you share an API key, a password, a server credential, or a sensitive screenshot via Slack, Teams, or Email, you create a permanent, unencrypted liability. That data lives in chat histories and server backups forever. If that platform is ever breached, or if an employee's laptop is compromised, your sensitive data is instantly exposed.
+# 🧩 Problem
 
-The Solution: Crypton
-Crypton is a Zero-Knowledge, fully ephemeral secure sharing platform. It allows you to share sensitive text and images using military-grade client-side encryption. Once the message is viewed or the timer expires, it is mathematically obliterated from existence.
+Sensitive information is often shared through platforms that are designed to keep information available.
 
-Not even the server administrators, database hosts, or ISPs can read your data.
+Examples include:
 
-🔥 Why You Need This (Core Features)
-Zero-Knowledge Architecture: Encryption happens inside your browser before the data ever touches the internet. The server only receives an unrecognizable, scrambled blob of data. We couldn't read your secrets even if we were legally forced to.
+* API keys
+* Passwords
+* Server credentials
+* Configuration values
+* Temporary access information
+* Private notes
+* Error logs
+* Sensitive screenshots
+* Files and images
 
-Multimedia Dead-Drops: Drag-and-drop support for both text and images in a single encrypted payload. Perfect for securely sharing server logs alongside a screenshot of an error.
+Once this information is shared through normal messaging, email, or cloud storage, copies may remain in message histories, databases, backups, synced devices, or other locations.
 
-True "Burn After Reading": The moment the recipient decrypts the message, the encrypted payload is instantly and permanently purged from the database memory.
+For information that only needs to be viewed temporarily, this creates unnecessary exposure.
 
-The Snipping Tool Trap (Anti-Screenshot): Mitigates the "Analog Hole." If a user attempts to use a screen-snipping tool or clicks away from the browser, the message instantly vanishes behind a security shield. Text selection and copying are completely disabled.
+### The problem we wanted to solve
 
-The Remote Kill Switch: Sent the link to the wrong person? Use the cryptographic Delete Token provided upon creation to manually detonate the payload on the server before anyone can open it.
+> **How can sensitive information be shared securely while giving the sender control over how long it remains accessible?**
 
-Time-To-Live (TTL) Hard-Fails: Powered by Redis, expiration isn't just a software rule; it's a memory-level absolute. When the timer hits zero, the database evicts the data automatically.
+---
 
-🏗️ Architectural Philosophy & Rationale
-Crypton was engineered from the ground up to solve the "Trust" problem. Standard pastebins require you to trust their servers. Crypton only requires you to trust mathematics.
+# 💡 Solution
 
-🗺️ System Architecture Data Flow
-Crypton's security model relies on the fact that the decryption key never touches the server. Here is the lifecycle of a secure payload:
+Crypton treats sensitive information as a **temporary resource** rather than a permanent message.
 
-[Crypton Architecture]
-<img width="2167" height="1954" alt="architecture" src="https://github.com/user-attachments/assets/6c7312b2-f402-4db8-8971-90846aff7f22" />
+The content is encrypted on the client side before the encrypted payload is sent to the backend.
 
+The sender can then control its lifecycle using:
 
+* Expiration time
+* Maximum views
+* Burn-after-reading
+* Manual deletion
+* Optional password protection
+* Controlled reveal
+* Screenshot/snipping mitigation
 
-1. The Cryptographic Engine (AES-256-GCM & PBKDF2)
-We utilize the native Web Crypto API to ensure high-performance, sandboxed cryptography.
-d
-The Rationale: By relying on native browser APIs, we avoid importing vulnerable third-party crypto libraries. Data is encrypted using AES-256-GCM, providing both confidentiality and data authenticity (tamper-proofing). Keys are hardened using PBKDF2 with 100,000 iterations to completely neutralize brute-force attacks.
+Crypton also adds an additional concealment option through **image steganography**, where encrypted data can be embedded inside a carrier image.
 
-2. The "Split-Key" Distribution Model
-When a payload is encrypted, the encryption key is intentionally left out of the server request.
+---
 
-The Rationale: The decryption key is generated locally and attached to the URL as a URL Fragment (the part after the #). URL fragments are never sent to the server. This creates a perfect split-key architecture: the server holds the locked vault, and the URL holds the key. The two pieces only meet inside the recipient's browser.
+# ✨ Key Features
 
-3. Out-of-Band Authentication
-Users can optionally combine the auto-generated URL key with a manual, human-typed password.
+## 🔒 Client-Side AES-256-GCM Encryption
 
-The Rationale: If a hacker compromises an email account and finds a Crypton link, they have both the vault location and the URL key. By requiring a manual password (sent via a secondary channel like SMS or Signal), we ensure that intercepting the digital link is useless without physical knowledge of the password.
+Sensitive content is encrypted in the browser using the native **Web Crypto API**.
 
-4. RAM-Only Ephemeral Storage (Redis)
-Instead of a traditional SQL or NoSQL hard-drive database, the backend is strictly powered by Redis.
-2. The "Split-Key" Distribution Model
-When a payload is encrypted, the primary encryption key is a 16-character cryptographically secure random string. This string is intentionally left out of the server request and attached to the URL as a URL Fragment (the part after the #).
+Crypton uses:
 
-The Rationale: Browsers are designed so that URL fragments are never sent to the server. This creates a perfect split-key architecture: the server holds the locked vault, and the URL holds the key. The two pieces only meet inside the recipient's browser.
+* AES-256-GCM for authenticated encryption
+* PBKDF2 for password/key derivation where applicable
+* Browser-native cryptographic APIs
 
-3. Frictionless Derivation (With or Without a Password)
-Users can optionally combine the auto-generated URL key with a manual, human-typed password. However, even if no password is provided, the system does not downgrade security. It feeds the 16-character URL fragment (combined with an empty string) through PBKDF2 with 100,000 iterations to derive the final AES-256 key.
+The backend receives the encrypted payload rather than the original plaintext content.
 
-The Rationale: This guarantees military-grade encryption by default, without forcing the user to invent a password. If a user does add a password, it acts as Out-of-Band Authentication. An attacker intercepting the digital URL still needs the physical password sent via a secondary channel (like SMS or Signal) to unlock the payload.
+---
 
-4. The Anti-Bloat Philosophy (Why Less is More)
-Crypton intentionally avoids traditional enterprise security bloat: there are no user accounts, no login screens, no OAuth, and no complex server-side access control lists (ACLs).
+## 🗝️ Split-Key URL Design
 
-The Rationale: Traditional security features require the server to know who you are and what you are doing, which completely destroys the Zero-Knowledge model. Furthermore, heavy Identity and Access Management (IAM) adds massive friction. Crypton is a "digital dead-drop," designed to be instantaneous. Dragging the system down with complex authentication workflows would deter users and defeat the core purpose: providing a frictionless, mathematically secure alternative to pasting secrets in plain text.
+Crypton separates the encrypted payload from the client-side key material.
 
-5. RAM-Only Ephemeral Storage (Redis)
-Instead of a traditional SQL or NoSQL hard-drive database, the backend is strictly powered by Redis.
+The key can be placed in the URL fragment:
 
-The Rationale: Hard drives leave ghost data, even after deletion. Redis operates entirely in RAM. When a paste is "Burned" or its TTL expires, the memory allocation is instantly freed. There are no backups, no logs, and no traces left behind.
+```text
+https://crypton.example/share/<id>#<key>
+```
 
+The fragment portion of a URL is handled by the browser and is not included in the normal HTTP request.
 
-💻 Tech Stack
-Frontend: React (Vite) for state management and DOM manipulation.
+This allows the encrypted payload and key material to be separated between the server and client.
 
-Cryptography: Native Web Crypto API (SubtleCrypto).
+---
 
-Backend: Node.js (Express) configured for static serving and REST API handling.
+## 🔑 Optional Password Protection
 
-Database: Redis (Upstash Cloud) for sub-millisecond RAM storage and native TTL eviction.
+A user can add an additional password when creating a secure transfer.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+The password can be shared separately from the Crypton link.
 
-## Expanding the Oxlint configuration
+For example:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+```text
+Crypton Link → Email
+Password    → Separate channel
+```
+
+This provides an additional protection layer if the link itself is exposed.
+
+---
+
+## 🔥 Burn After Reading
+
+Crypton supports one-time access.
+
+When burn-after-reading is enabled, the secret is configured with a single allowed view and is removed after that successful access.
+
+This is useful for:
+
+* One-time credentials
+* Temporary passwords
+* API keys
+* Sensitive notes
+* Private information
+
+---
+
+## ⏱️ Automatic Expiration
+
+Each stored payload can have a TTL.
+
+Redis handles the expiration automatically, so a secret does not need to remain available indefinitely.
+
+If no custom TTL is supplied, the current implementation uses a default expiration period.
+
+---
+
+## 👁️ Maximum View Limits
+
+The sender can define how many successful views are allowed.
+
+Examples:
+
+```text
+Maximum views: 1
+```
+
+or:
+
+```text
+Maximum views: 5
+```
+
+Once the allowed number of views is reached, the payload is removed.
+
+---
+
+## 🗑️ Remote Deletion
+
+Every created secret receives a deletion token.
+
+The sender can use that token to delete the stored payload before its normal expiration.
+
+This is useful when:
+
+* A link was shared with the wrong person
+* The information is no longer required
+* A credential has been rotated
+* Access needs to be revoked immediately
+
+---
+
+## 🖼️ Text, Files and Images
+
+Crypton supports secure sharing of sensitive content including text and supported file/image payloads.
+
+The goal is to keep the sharing workflow simple while applying the same temporary-access principles to different types of information.
+
+---
+
+# 🖼️ Image Steganography
+
+Crypton's steganography feature provides an additional concealment layer.
+
+Instead of exposing an encrypted payload directly, encrypted information can be embedded into a carrier image.
+
+### Encoding
+
+```text
+Original Content
+       ↓
+Client-Side Encryption
+       ↓
+Encrypted Payload
+       ↓
+Steganographic Embedding
+       ↓
+Carrier Image
+```
+
+### Decoding
+
+```text
+Protected Image
+       ↓
+Extract Embedded Payload
+       ↓
+Recover Encrypted Data
+       ↓
+Recover Key / Password
+       ↓
+Integrity Verification
+       ↓
+Original Content
+```
+
+The important distinction is:
+
+> **Encryption protects the information. Steganography conceals the presence of the protected information.**
+
+---
+
+# 🛡️ Controlled Viewing
+
+Crypton includes additional controls designed to reduce accidental exposure while sensitive content is being viewed.
+
+### Hold to Reveal
+
+Sensitive content can remain hidden until the recipient actively interacts with the reveal control.
+
+### Copy Restrictions
+
+Text selection and copying can be restricted while protected content is displayed.
+
+### Focus-Loss Protection
+
+The application can hide protected content when the browser loses focus.
+
+### Screenshot / Snipping Mitigation
+
+Crypton includes client-side measures intended to react to screenshot and screen-snipping activity.
+
+These features are intended as **exposure-mitigation controls**, not as an absolute guarantee against screen capture.
+
+A user can always photograph a screen with another device, so this limitation is part of the threat model.
+
+---
+
+# 🏗️ Security Architecture
+
+Crypton's security model is based on keeping encryption on the client side and keeping server-side storage temporary.
+
+```text
+                         SENDER
+                           │
+                           ▼
+                   Sensitive Content
+                           │
+                           ▼
+                Client-Side Encryption
+                           │
+                           ▼
+                     AES-256-GCM
+                           │
+                           ▼
+                  Encrypted Payload
+                           │
+                           ▼
+                    Redis Storage
+                           │
+                    ┌──────┴──────┐
+                    │             │
+                 TTL Expiry   View Control
+                    │             │
+                    └──────┬──────┘
+                           │
+                           ▼
+                     Shared Link
+                           │
+                           ▼
+                       RECIPIENT
+                           │
+                           ▼
+                 Retrieve Ciphertext
+                           │
+                           ▼
+             Key / Password Recovery
+                           │
+                           ▼
+                 Client-Side Decryption
+                           │
+                           ▼
+                   Original Content
+                           │
+                           ▼
+                 Burn / Delete / Expire
+```
+
+---
+
+# 🔐 Encryption
+
+Crypton uses the browser's native Web Crypto API rather than implementing the underlying encryption algorithm itself.
+
+### AES-256-GCM
+
+AES-GCM provides authenticated encryption, giving the system both:
+
+* Confidentiality
+* Integrity protection
+
+### PBKDF2
+
+PBKDF2 is used where password/key derivation is required.
+
+The derivation process increases the computational cost of password guessing compared with using a password directly as an encryption key.
+
+### Why Web Crypto API?
+
+Using the browser's native cryptographic API allows Crypton to rely on established platform cryptographic primitives rather than implementing AES itself.
+
+---
+
+# 🗝️ Split-Key Design
+
+The encrypted payload stored by the backend and the client-side key material are intentionally separated.
+
+Conceptually:
+
+```text
+SERVER
+└── Encrypted Payload
+    ├── Ciphertext
+    ├── IV
+    └── Salt
+
+CLIENT
+└── Key Material
+```
+
+The URL fragment can carry the client-side key material because URL fragments are not sent as part of the normal HTTP request.
+
+The encrypted payload therefore remains separate from the fragment during server communication.
+
+---
+
+# ⚡ Ephemeral Storage
+
+Crypton uses Redis for temporary payload storage.
+
+The backend stores information such as:
+
+* Encrypted ciphertext
+* IV
+* Salt
+* Expiration information
+* View information
+* Burn-after-reading state
+* Deletion token
+
+Redis TTL is applied when the payload is created.
+
+The lifecycle is:
+
+```text
+CREATE
+   ↓
+ENCRYPT
+   ↓
+STORE
+   ↓
+SHARE
+   ↓
+VIEW
+   ↓
+DELETE / BURN / EXPIRE
+```
+
+The application is therefore designed around **temporary storage rather than permanent secret records**.
+
+---
+
+# 🔄 System Flow
+
+## Sender
+
+```text
+1. Open Crypton
+        ↓
+2. Enter or upload content
+        ↓
+3. Configure expiration / views / security options
+        ↓
+4. Encrypt content in the browser
+        ↓
+5. Send encrypted payload to backend
+        ↓
+6. Store temporary payload in Redis
+        ↓
+7. Generate sharing link
+        ↓
+8. Share with recipient
+```
+
+## Recipient
+
+```text
+1. Open Crypton link
+        ↓
+2. Retrieve encrypted payload
+        ↓
+3. Recover client-side key material
+        ↓
+4. Enter password if required
+        ↓
+5. Decrypt locally
+        ↓
+6. Reveal protected content
+        ↓
+7. Consume the configured view
+        ↓
+8. Payload is deleted when its lifecycle ends
+```
+
+---
+
+# 🖼️ Architecture & Feature Overview
+
+## Platform Overview
+
+Save the provided overview image in the repository as:
+
+```text
+Crypton/crypton-overview.png
+```
+
+![Crypton Feature Overview](./Crypton/crypton-overview.png)
+
+## System Architecture
+
+The existing architecture diagram is retained below:
+
+![Crypton Architecture](./Crypton/architecture.png)
+
+---
+
+# 💻 Technology Stack
+
+| Layer               | Technology        |
+| ------------------- | ----------------- |
+| Frontend            | React 19          |
+| Build Tool          | Vite              |
+| Backend             | Node.js + Express |
+| Cryptography        | Web Crypto API    |
+| Encryption          | AES-256-GCM       |
+| Key Derivation      | PBKDF2            |
+| Storage             | Redis             |
+| Cloud Redis         | Upstash Redis     |
+| Security Middleware | Helmet            |
+| API                 | REST              |
+| Deployment          | Vercel            |
+
+---
+
+# 📁 Project Structure
+
+```text
+Crypton/
+│
+├── api/
+│   ├── paste/
+│   │   ├── [id]/
+│   │   └── index.js
+│   └── _redis.js
+│
+├── public/
+│
+├── src/
+│   └── frontend source files
+│
+├── architecture.png
+├── crypton-overview.png
+├── securebin_flow.png
+│
+├── server.js
+├── index.html
+├── package.json
+├── package-lock.json
+├── vite.config.js
+└── README.md
+```
+
+The repository uses the `Crypton` directory as the application project, with the root repository containing the project folder and documentation.
+
+---
+
+# ⚙️ Running Locally
+
+## Requirements
+
+Install:
+
+* Node.js
+* npm
+* Redis
+* Git
+
+For local development, Redis should be available at:
+
+```text
+redis://127.0.0.1:6379
+```
+
+The Vite development configuration proxies `/api` requests to the local backend on port `3000`.
+
+---
+
+## 1. Clone the Repository
+
+```bash
+git clone https://github.com/shraddha-sugathan/Crypton.git
+cd Crypton/Crypton
+```
+
+---
+
+## 2. Install Dependencies
+
+```bash
+npm install
+```
+
+---
+
+## 3. Start Redis
+
+Make sure Redis is running locally on port `6379`.
+
+For example:
+
+```bash
+redis-server
+```
+
+If Redis is already installed as a system service, simply make sure the service is running.
+
+---
+
+## 4. Start the Backend
+
+Open a terminal inside:
+
+```text
+Crypton/Crypton
+```
+
+Run:
+
+```bash
+node server.js
+```
+
+The backend runs on:
+
+```text
+http://localhost:3000
+```
+
+---
+
+## 5. Start the Frontend
+
+Open a second terminal:
+
+```bash
+cd Crypton/Crypton
+npm run dev
+```
+
+Vite will start the development server.
+
+Open the local HTTPS URL shown in the terminal, normally:
+
+```text
+https://localhost:5173
+```
+
+Because the project uses Vite's basic SSL plugin, the development server uses HTTPS.
+
+---
+
+## 6. Build for Production
+
+To create a production build:
+
+```bash
+npm run build
+```
+
+To preview the production build locally:
+
+```bash
+npm run preview
+```
+
+---
+
+# 🔧 Environment Variables
+
+For the serverless API implementation, Redis can be configured using:
+
+```env
+REDIS_URL=your_redis_connection_string
+```
+
+If `REDIS_URL` is not provided, the local API Redis helper falls back to:
+
+```text
+redis://127.0.0.1:6379
+```
+
+Never commit production Redis credentials or other secrets to GitHub.
+
+---
+
+# ☁️ Deployment
+
+The current application is deployed online and available through the live demo.
+
+**Production Demo:**
+[Crypton Live Demo](https://crypton-omega-olive.vercel.app/?utm_source=chatgpt.com)
+
+For a Vercel deployment, the application project is located inside the `Crypton` directory.
+
+Production Redis credentials should be configured through environment variables rather than committed to the repository.
+
+---
+
+# 🧪 Testing Checklist
+
+Before demonstrating the project, verify the following:
+
+* [ ] Create a text secret
+* [ ] Open a generated secret link
+* [ ] Verify client-side decryption
+* [ ] Test expiration
+* [ ] Test maximum view limits
+* [ ] Test burn-after-reading
+* [ ] Test remote deletion
+* [ ] Test optional password protection
+* [ ] Test file/image sharing
+* [ ] Test image steganography encoding
+* [ ] Test steganography extraction
+* [ ] Test incorrect password handling
+* [ ] Test modified/corrupted payload handling
+* [ ] Test hold-to-reveal
+* [ ] Test focus-loss protection
+* [ ] Test screenshot/snipping mitigation
+
+---
+
+# 💡 Innovation
+
+Crypton takes the basic secure-sharing problem and extends it in several directions.
+
+### 1. Temporary by Design
+
+Secrets are created with a controlled lifecycle instead of being treated as permanent messages.
+
+### 2. Multiple Access Controls
+
+The sender can combine:
+
+* Expiration
+* View limits
+* Burn-after-reading
+* Password protection
+* Manual deletion
+
+### 3. Image Steganography
+
+Encrypted data can be concealed inside a carrier image, adding a second layer beyond encryption.
+
+### 4. Controlled Viewing
+
+The application includes hold-to-reveal, copy restrictions, focus-loss handling, and screen-capture mitigation.
+
+### 5. Minimal Account Friction
+
+The core sharing flow does not require users to create a traditional account before sending a secret.
+
+### 6. Client-Side Cryptography
+
+Encryption takes place in the browser before the protected payload is sent to the storage backend.
+
+---
+
+# 🆚 PrivateBin Reference
+
+PrivateBin was used as a reference implementation to understand the underlying problem of secure, temporary information sharing.
+
+Crypton is an independent implementation with its own:
+
+* Architecture
+* User interface
+* Security controls
+* Storage lifecycle
+* Steganography workflow
+* Viewing controls
+* User experience
+
+The goal was to preserve the **purpose of secure temporary sharing** while exploring a different implementation and additional functionality.
+
+Reference:
+
+[PrivateBin GitHub Repository](https://github.com/PrivateBin/PrivateBin?utm_source=chatgpt.com)
+
+---
+
+# 🏆 Judging Rubric Alignment
+
+## 1. Problem Understanding 
+
+Crypton addresses the problem of sensitive information being unnecessarily retained in conventional communication platforms.
+
+The platform focuses on:
+
+* Temporary sharing
+* Controlled access
+* Data minimization
+* Expiration
+* Secure transmission
+
+---
+
+## 2. Innovation & Differentiation 
+
+Crypton's main differentiating features include:
+
+* Image steganography
+* Split-key URL design
+* Burn-after-reading
+* Maximum view limits
+* Remote deletion
+* Optional password protection
+* Hold-to-reveal
+* Screen-capture mitigation
+* Ephemeral Redis storage
+
+The project is independently implemented rather than reproducing PrivateBin's interface or implementation.
+
+---
+
+## 3. Technical Implementation & Architecture 
+
+The project combines:
+
+* React
+* Vite
+* Node.js
+* Express
+* Redis
+* Web Crypto API
+* AES-256-GCM
+* PBKDF2
+* REST APIs
+* Steganographic encoding
+
+The architecture separates client-side encryption from temporary backend storage.
+
+---
+
+## 4. User Experience & Accessibility 
+
+Crypton presents security controls through familiar user actions:
+
+* Set expiration
+* Set number of views
+* Add a password
+* Reveal content
+* Delete a secret
+* Share a link
+
+The workflow is designed to minimize unnecessary steps while keeping the important security controls visible.
+
+---
+
+## 5. Performance, Reliability & Demo Quality 
+
+Crypton uses lightweight web technologies and Redis for temporary data access.
+
+The application is deployed and available through the live demo.
+
+The production workflow also separates the frontend experience from the temporary storage layer.
+
+---
+
+## 6. Documentation & Explanation 
+
+This README documents:
+
+* The problem
+* The solution
+* Core functionality
+* Security architecture
+* Encryption
+* Key separation
+* Redis storage
+* Steganography
+* System flow
+* Technology stack
+* Local setup
+* Testing
+* Innovation
+* Limitations
+* Future improvements
+
+---
+
+# ⚠️ Security Considerations & Limitations
+
+Crypton is designed to reduce the persistence and exposure of sensitive information, but browser-based security controls cannot eliminate every possible attack.
+
+Important limitations include:
+
+* A recipient can photograph a decrypted secret using another device.
+* Screenshot and snipping protections cannot guarantee prevention of every capture technique.
+* A compromised recipient device can expose content after decryption.
+* Password protection depends partly on the strength and secrecy of the password.
+* The security of the client-side application depends on the integrity of the browser and deployed application.
+* Steganography is a concealment mechanism and does not replace encryption.
+* Temporary storage does not protect content after it has already been decrypted and displayed to a recipient.
+
+These limitations are considered part of Crypton's threat model.
+
+---
+
+# 🔮 Future Improvements
+
+Potential improvements include:
+
+* WebAuthn-based authentication
+* Hardware-backed key protection
+* Security auditing and penetration testing
+* Automated security regression testing
+* More granular recipient permissions
+* Improved steganographic capacity
+* Additional file-format support
+* Stronger device-level protections
+* Enterprise deployment options
+* More advanced access policies
+
+---
+
+# 📚 Reference
+
+### PrivateBin
+
+[PrivateBin GitHub Repository](https://github.com/PrivateBin/PrivateBin?utm_source=chatgpt.com)
+
+PrivateBin was used to understand the secure-sharing problem and reference existing approaches.
+
+Crypton is an independently implemented solution with a different interface, architecture, feature set, and user experience.
+
+---
+
+# 🔐 Crypton
+
+**Encrypt → Share → Control → Reveal → Expire**
