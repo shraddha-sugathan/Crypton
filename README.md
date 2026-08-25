@@ -1,4 +1,4 @@
-# 🔐 Crypton
+# Crypton
 
 ### Secure, controlled and temporary sharing of sensitive information
 
@@ -9,12 +9,12 @@ The project combines **client-side AES-256-GCM encryption, temporary Redis stora
 **Live Demo:**
 https://crypton-omega-olive.vercel.app/
 
-## 🔎 Platform Overview
+## Platform Overview
 
 ![Crypton Platform Overview](./Crypton/crypton-overview.png)
 ---
 
-## 📌 Table of Contents
+## Table of Contents
 
 * [Problem](#-problem)
 * [Solution](#-solution)
@@ -39,7 +39,7 @@ https://crypton-omega-olive.vercel.app/
 
 ---
 
-# 🧩 Problem
+# Problem
 
 Sensitive information is often shared through platforms that are designed to keep information available.
 
@@ -65,7 +65,7 @@ For information that only needs to be viewed temporarily, this creates unnecessa
 
 ---
 
-# 💡 Solution
+# Solution
 
 Crypton treats sensitive information as a **temporary resource** rather than a permanent message.
 
@@ -85,9 +85,9 @@ Crypton also adds an additional concealment option through **image steganography
 
 ---
 
-# ✨ Key Features
+# Key Features
 
-## 🔒 Client-Side AES-256-GCM Encryption
+## Client-Side AES-256-GCM Encryption
 
 Sensitive content is encrypted in the browser using the native **Web Crypto API**.
 
@@ -101,7 +101,7 @@ The backend receives the encrypted payload rather than the original plaintext co
 
 ---
 
-## 🗝️ Split-Key URL Design
+## Split-Key URL Design
 
 Crypton separates the encrypted payload from the client-side key material.
 
@@ -117,7 +117,7 @@ This allows the encrypted payload and key material to be separated between the s
 
 ---
 
-## 🔑 Optional Password Protection
+## Optional Password Protection
 
 A user can add an additional password when creating a secure transfer.
 
@@ -134,7 +134,7 @@ This provides an additional protection layer if the link itself is exposed.
 
 ---
 
-## 🔥 Burn After Reading
+## Burn After Reading
 
 Crypton supports one-time access.
 
@@ -150,7 +150,7 @@ This is useful for:
 
 ---
 
-## ⏱️ Automatic Expiration
+##  Automatic Expiration
 
 Each stored payload can have a TTL.
 
@@ -160,7 +160,7 @@ If no custom TTL is supplied, the current implementation uses a default expirati
 
 ---
 
-## 👁️ Maximum View Limits
+##  Maximum View Limits
 
 The sender can define how many successful views are allowed.
 
@@ -180,7 +180,7 @@ Once the allowed number of views is reached, the payload is removed.
 
 ---
 
-## 🗑️ Remote Deletion
+##  Remote Deletion
 
 Every created secret receives a deletion token.
 
@@ -195,7 +195,7 @@ This is useful when:
 
 ---
 
-## 🖼️ Text, Files and Images
+## Text, Files and Images
 
 Crypton supports secure sharing of sensitive content including text and supported file/image payloads.
 
@@ -203,7 +203,7 @@ The goal is to keep the sharing workflow simple while applying the same temporar
 
 ---
 
-# 🖼️ Image Steganography
+# Image Steganography
 
 Crypton's steganography feature provides an additional concealment layer.
 
@@ -245,17 +245,13 @@ The important distinction is:
 
 ---
 
-# 🛡️ Controlled Viewing
+#  Controlled Viewing
 
 Crypton includes additional controls designed to reduce accidental exposure while sensitive content is being viewed.
 
 ### Hold to Reveal
 
 Sensitive content can remain hidden until the recipient actively interacts with the reveal control.
-
-### Copy Restrictions
-
-Text selection and copying can be restricted while protected content is displayed.
 
 ### Focus-Loss Protection
 
@@ -271,7 +267,7 @@ A user can always photograph a screen with another device, so this limitation is
 
 ---
 
-# 🏗️ Security Architecture
+# Security Architecture
 
 Crypton's security model is based on keeping encryption on the client side and keeping server-side storage temporary.
 
@@ -323,7 +319,7 @@ Crypton's security model is based on keeping encryption on the client side and k
 
 ---
 
-# 🔐 Encryption
+#  Encryption
 
 Crypton uses the browser's native Web Crypto API rather than implementing the underlying encryption algorithm itself.
 
@@ -346,7 +342,7 @@ Using the browser's native cryptographic API allows Crypton to rely on establish
 
 ---
 
-# 🗝️ Split-Key Design
+#  Split-Key Design
 
 The encrypted payload stored by the backend and the client-side key material are intentionally separated.
 
@@ -369,7 +365,7 @@ The encrypted payload therefore remains separate from the fragment during server
 
 ---
 
-# ⚡ Ephemeral Storage
+#  Ephemeral Storage
 
 Crypton uses Redis for temporary payload storage.
 
@@ -405,7 +401,7 @@ The application is therefore designed around **temporary storage rather than per
 
 ---
 
-# 🔄 System Flow
+#  System Flow
 
 ## Sender
 
@@ -449,7 +445,7 @@ The application is therefore designed around **temporary storage rather than per
 
 ---
 
-## 🖼️ System Architecture
+##  System Architecture
 
 The existing architecture diagram is retained below:
 
@@ -457,7 +453,7 @@ The existing architecture diagram is retained below:
 
 ---
 
-# 💻 Technology Stack
+#  Technology Stack
 
 | Layer               | Technology        |
 | ------------------- | ----------------- |
@@ -475,7 +471,7 @@ The existing architecture diagram is retained below:
 
 ---
 
-# 📁 Project Structure
+#  Project Structure
 
 ```text
 Crypton/
@@ -507,7 +503,7 @@ The repository uses the `Crypton` directory as the application project, with the
 
 ---
 
-# ⚙️ Running Locally
+#  Running Locally
 
 ## Requirements
 
@@ -618,7 +614,7 @@ npm run preview
 
 ---
 
-# 🔧 Environment Variables
+#  Environment Variables
 
 For the serverless API implementation, Redis can be configured using:
 
@@ -631,12 +627,9 @@ If `REDIS_URL` is not provided, the local API Redis helper falls back to:
 ```text
 redis://127.0.0.1:6379
 ```
-
-Never commit production Redis credentials or other secrets to GitHub.
-
 ---
 
-# ☁️ Deployment
+#  Deployment
 
 The current application is deployed online and available through the live demo.
 
@@ -649,7 +642,7 @@ Production Redis credentials should be configured through environment variables 
 
 ---
 
-# 🧪 Testing Checklist
+#  Testing Checklist
 
 Before demonstrating the project, verify the following:
 
@@ -672,7 +665,7 @@ Before demonstrating the project, verify the following:
 
 ---
 
-# 💡 Innovation
+#  Innovation
 
 Crypton takes the basic secure-sharing problem and extends it in several directions.
 
@@ -708,7 +701,7 @@ Encryption takes place in the browser before the protected payload is sent to th
 
 ---
 
-# 🆚 PrivateBin Reference
+#  PrivateBin Reference
 
 PrivateBin was used as a reference implementation to understand the underlying problem of secure, temporary information sharing.
 
@@ -730,7 +723,7 @@ Reference:
 
 ---
 
-# 🏆 Judging Rubric Alignment
+#  Judging Rubric Alignment
 
 ## 1. Problem Understanding 
 
@@ -830,7 +823,7 @@ This README documents:
 
 ---
 
-# ⚠️ Security Considerations & Limitations
+#  Security Considerations & Limitations
 
 Crypton is designed to reduce the persistence and exposure of sensitive information, but browser-based security controls cannot eliminate every possible attack.
 
@@ -848,7 +841,7 @@ These limitations are considered part of Crypton's threat model.
 
 ---
 
-# 🔮 Future Improvements
+#  Future Improvements
 
 Potential improvements include:
 
@@ -865,7 +858,7 @@ Potential improvements include:
 
 ---
 
-# 📚 Reference
+#  Reference
 
 ### PrivateBin
 
@@ -877,6 +870,6 @@ Crypton is an independently implemented solution with a different interface, arc
 
 ---
 
-# 🔐 Crypton
+#  Crypton
 
 **Encrypt → Share → Control → Reveal → Expire**
