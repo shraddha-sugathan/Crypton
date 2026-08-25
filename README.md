@@ -9,6 +9,9 @@ The project combines **client-side AES-256-GCM encryption, temporary Redis stora
 **Live Demo:**
 https://crypton-omega-olive.vercel.app/
 
+## 🔎 Platform Overview
+
+![Crypton Platform Overview](./crypton-overview.png)
 ---
 
 ## 📌 Table of Contents
