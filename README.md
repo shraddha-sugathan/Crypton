@@ -449,19 +449,7 @@ The application is therefore designed around **temporary storage rather than per
 
 ---
 
-# 🖼️ Architecture & Feature Overview
-
-## Platform Overview
-
-Save the provided overview image in the repository as:
-
-```text
-Crypton/crypton-overview.png
-```
-
-![Crypton Feature Overview](./Crypton/crypton-overview.png)
-
-## System Architecture
+## 🖼️ System Architecture
 
 The existing architecture diagram is retained below:
 
